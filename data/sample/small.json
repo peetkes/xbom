@@ -1,0 +1,80 @@
+[
+    {
+        "content": {
+            "altCode": null,
+            "child": "D00010001---",
+            "childFlying": "yes",
+            "childIssue": "G00",
+            "childNatco": null,
+            "childType": "STDPT",
+            "itemNumber": "0008",
+            "linkType": "MA",
+            "msns": [
+                203042,
+                202791,
+                202917,
+                204906,
+                203113,
+                205068,
+                203378,
+                203538,
+                204944,
+                203510,
+                203418,
+                203577,
+                203103,
+                203581
+            ],
+            "parent": "D00010486000",
+            "parentIssue": "A00",
+            "parentNatco": "A-F",
+            "parentType": "ADAPDS",
+            "partner": "GILDA",
+            "program": "SA",
+            "quantity": 1,
+            "quantityUnit": "EA",
+            "source": "PCS",
+            "zoneReference": null
+        },
+        "uri": "/eBomLink/SA_D00010486000_D00010001---_0008__1.json"
+    },
+    {
+        "content": {
+            "altCode": null,
+            "child": "D00010002---",
+            "childFlying": "yes",
+            "childIssue": "F00",
+            "childNatco": null,
+            "childType": "STDPT",
+            "itemNumber": "0009",
+            "linkType": "MA",
+            "msns": [
+                203042,
+                202791,
+                202917,
+                204906,
+                203113,
+                205068,
+                203378,
+                203538,
+                204944,
+                203510,
+                203418,
+                203577,
+                203103,
+                203581
+            ],
+            "parent": "D00010486000",
+            "parentIssue": "A00",
+            "parentNatco": "A-F",
+            "parentType": "ADAPDS",
+            "partner": "GILDA",
+            "program": "SA",
+            "quantity": 1,
+            "quantityUnit": "EA",
+            "source": "PCS",
+            "zoneReference": null
+        },
+        "uri": "/eBomLink/SA_D00010486000_D00010002---_0009__1.json"
+    }
+]

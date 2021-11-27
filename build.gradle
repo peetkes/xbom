@@ -116,6 +116,16 @@ task corbPathChild(type: com.marklogic.gradle.task.CorbTask) {
   batchSize = Integer.parseInt(corbBatchSize)
 }
 
+task corbPathChildNew(type: com.marklogic.gradle.task.CorbTask) {
+  project.ext.corbOptionsFile = "src/main/ml-modules/root/ext/corb/path-child/options.txt"
+  xccConnectionUri = contentXccUrl
+  moduleRoot = "/ext/corb/path-child/"
+  urisModule = "collectorNew.sjs"
+  processModule = "mainNew.sjs"
+  threadCount = Integer.parseInt(corbThreadCount)
+  batchSize = Integer.parseInt(corbBatchSize)
+}
+
 task importCompressedData(type: com.marklogic.gradle.task.MlcpTask) {
   classpath = configurations.mlcp
   command = "IMPORT"
@@ -137,7 +147,6 @@ task importCompressedData(type: com.marklogic.gradle.task.MlcpTask) {
   args = ["-input_file_path", "data/zips/eBomLink"]
 }
 
-//this runs really slow!! DO NOT USE!!
 task importData(type: com.marklogic.gradle.task.MlcpTask) {
   classpath = configurations.mlcp
   command = "IMPORT"
@@ -148,14 +157,16 @@ task importData(type: com.marklogic.gradle.task.MlcpTask) {
   database = mlAppConfig.contentDatabaseName
   output_collections = "eBomLink"
   output_permissions = "rest-reader,read,rest-writer,update"
-  output_uri_replace = ".*data/export/eBomLink,''"
+  output_uri_replace = ".*data/sample,''"
+  transform_function = "split"
+  transform_module = "/mlcp/split.sjs"
 //  logOutputUri = "mlcp-import-log.txt"
   /**
    * The args array can be used for any MLCP parameters that are not supported by the MlcpBean class that MlcpTask
    * delegates to. input_file_path is supported by MlcpTask; this is just included as an example of using the args
    * array.
    */
-  args = ["-input_file_path", "data/export/eBomLink"]
+  args = ["-input_file_path", "data/sample/samples.json"]
 }
 
 task exportCompressedData(type: com.marklogic.gradle.task.MlcpTask) {
