@@ -1,0 +1,5 @@
+{
+  "role-name" : "xbom-reader-role",
+  "description" : "Can view documents, but not edit",
+  "role" : [ "rest-reader", "xbom-nobody-role" ]
+}

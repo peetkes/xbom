@@ -1,0 +1,18 @@
+-host
+localhost
+-port
+8010
+-username
+admin
+-password
+admin
+-output_collections
+taskbot, xbom
+-document_type
+json
+-input_file_path
+data/export
+-output_uri_replace
+".*export,'/export'"
+-output_permissions
+"rest-reader,read,rest-writer,update"

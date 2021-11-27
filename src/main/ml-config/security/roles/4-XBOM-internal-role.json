@@ -1,0 +1,5 @@
+{
+  "role-name" : "xbom-internal-role",
+  "description" : "Internal role used for amping",
+  "role" : [ "xbom-writer-role" ]
+}

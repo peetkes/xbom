@@ -1,0 +1,5 @@
+{
+  "role-name" : "xbom-nobody-role",
+  "description" : "Unauthenticated user",
+  "role" : [ ]
+}

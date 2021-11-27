@@ -1,0 +1,33 @@
+{
+  "database-name" : "%%DATABASE%%",
+  "schema-database": "%%SCHEMAS_DATABASE%%",
+  "range-element-index" : [{
+    "collation": "http://marklogic.com/collation/",
+    "localname": "parent",
+    "namespace-uri": "",
+    "range-value-positions": false,
+    "scalar-type": "string",
+    "invalid-values": "ignore"
+  },{
+    "collation": "http://marklogic.com/collation/",
+    "localname": "child",
+    "namespace-uri": "",
+    "range-value-positions": false,
+    "scalar-type": "string",
+    "invalid-values": "ignore"
+  },{
+    "collation": "http://marklogic.com/collation/",
+    "localname": "level",
+    "namespace-uri": "",
+    "range-value-positions": false,
+    "scalar-type": "int",
+    "invalid-values": "ignore"
+  },{
+    "collation": "",
+    "localname": "msns",
+    "namespace-uri": "",
+    "range-value-positions": false,
+    "scalar-type": "int",
+    "invalid-values": "ignore"
+  }]
+}

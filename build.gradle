@@ -1,0 +1,188 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    //Needed for CorbTask to dynamically generate properties from CORB Options class
+    classpath "com.marklogic:marklogic-corb:${corbVersion}"
+    classpath "com.marklogic:ml-gradle:${mlGradleVersion}"
+  }
+}
+
+plugins {
+    id "com.marklogic.ml-gradle" version "${mlGradleVersion}"
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  // Needed for some mlcp dependencies, such as commons-csv:1.5.1-marklogic
+  maven { url "https://developer.marklogic.com/maven2/" }
+}
+
+configurations { 
+  corb 
+  mlcp
+}
+
+dependencies {
+  corb "com.marklogic:marklogic-corb:${corbVersion}"
+  // optional
+  corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
+  mlcp "com.marklogic:mlcp:${mlcpVersion}"
+  mlcp files("mlcp")
+}
+
+configurations.all {
+  // avoid SLF4J: classpath contains multiple SLF4J bindings
+  exclude group: 'ch.qos.logback'
+  exclude group: 'org.slf4j'
+}
+
+ext {
+    // XCC URL for running corb task below
+    contentXccUrl = "xcc://${mlUsername}:${mlPassword}@${mlHost}:${mlRestPort}"
+}
+
+task corb(type: com.marklogic.gradle.task.CorbTask) {
+    /* Either uncomment and set the xccConnectionUri below and set an appropriate XCC connection string,
+     * or specify on the commandline as a project property: -PcorbXccConnectionUri=xcc://user:pass@host:port/content-database
+     * or specify as a System property: -DXCC-CONNECTION-URI=xcc://user:pass@host:port/content-database
+     * or instread of setting the XCC-CONNECTION-URI, set the individual XCC options
+     * (XCC-HOSTNAME, XCC-PORT, XCC-USERNAME, XCC-PASSWORD, XCC-DBNAME)
+     */
+    xccConnectionUri = contentXccUrl
+}
+
+task corbAdhoc(type: com.marklogic.gradle.task.CorbTask) {
+    xccConnectionUri = contentXccUrl
+    urisModule = "src/main/ml-modules/ext/corb2-project/corb/uris.xqy|ADHOC"
+    processModule = "src/main/ml-modules/ext/corb2-project/corb/transform.xqy|ADHOC"
+}
+
+task runCorb(type: com.marklogic.gradle.task.CorbTask) {
+  moduleRoot = "/ext/sample/corb/"
+  modulePrefix = "test"
+  threadCount = Integer.parseInt(corbThreadCount)
+}
+
+task corbDeployed(type: com.marklogic.gradle.task.CorbTask, dependsOn: ['mlLoadModules']) {
+  project.ext.corbOptionsFile = "src/main/ml-modules/root/ext/corb/test/options.txt"
+  xccConnectionUri = contentXccUrl
+  moduleRoot = "/ext/corb/test/"
+  urisModule = "uris.xqy"
+  processModule = "transform.xqy"
+  threadCount = Integer.parseInt(corbThreadCount)
+}
+
+task corbGenerateTree(type: com.marklogic.gradle.task.CorbTask, dependsOn: ['mlLoadModules']) {
+  project.ext.corbOptionsFile = "src/main/ml-modules/root/ext/corb/generate-tree/options.txt"
+  xccConnectionUri = contentXccUrl
+  moduleRoot = "/ext/corb/generate-tree/"
+  urisModule = "uris.xqy"
+  processModule = "transform.xqy"
+  threadCount = Integer.parseInt(corbThreadCount)
+//  batchSize = Integer.parseInt(corbBatchSize)
+}
+
+task corbAddLevel(type: com.marklogic.gradle.task.CorbTask) {
+  project.ext.corbOptionsFile = "src/main/ml-modules/root/ext/corb/add-level/options.txt"
+  xccConnectionUri = contentXccUrl
+  moduleRoot = "/ext/corb/add-level/"
+  urisModule = "uris.sjs"
+  processModule = "addLevel.sjs"
+  threadCount = Integer.parseInt(corbThreadCount)
+  batchSize = Integer.parseInt(corbBatchSize)
+}
+
+task corbPathRoot(type: com.marklogic.gradle.task.CorbTask) {
+  project.ext.corbOptionsFile = "src/main/ml-modules/root/ext/corb/path-root/options.txt"
+  xccConnectionUri = contentXccUrl
+  moduleRoot = "/ext/corb/path-root/"
+  urisModule = "collector.sjs"
+  processModule = "main.sjs"
+  threadCount = Integer.parseInt(corbThreadCount)
+  batchSize = Integer.parseInt(corbBatchSize)
+}
+
+task corbPathChild(type: com.marklogic.gradle.task.CorbTask) {
+  project.ext.corbOptionsFile = "src/main/ml-modules/root/ext/corb/path-child/options.txt"
+  xccConnectionUri = contentXccUrl
+  moduleRoot = "/ext/corb/path-child/"
+  urisModule = "collector.sjs"
+  processModule = "main.sjs"
+  threadCount = Integer.parseInt(corbThreadCount)
+  batchSize = Integer.parseInt(corbBatchSize)
+}
+
+task importCompressedData(type: com.marklogic.gradle.task.MlcpTask) {
+  classpath = configurations.mlcp
+  command = "IMPORT"
+  host = mlHost
+  port = Integer.parseInt(mlRestPort)
+  username = mlUsername
+  password = mlPassword
+  database = mlAppConfig.contentDatabaseName
+  output_collections = "eBomLink"
+  output_permissions = "rest-reader,read,rest-writer,update"
+  output_uri_replace = ".*data/zips/eBomLink,''"
+//  logOutputUri = "mlcp-import-log.txt"
+  input_compressed = true
+  /**
+   * The args array can be used for any MLCP parameters that are not supported by the MlcpBean class that MlcpTask
+   * delegates to. input_file_path is supported by MlcpTask; this is just included as an example of using the args
+   * array.
+   */
+  args = ["-input_file_path", "data/zips/eBomLink"]
+}
+
+//this runs really slow!! DO NOT USE!!
+task importData(type: com.marklogic.gradle.task.MlcpTask) {
+  classpath = configurations.mlcp
+  command = "IMPORT"
+  host = mlHost
+  port = Integer.parseInt(mlRestPort)
+  username = mlUsername
+  password = mlPassword
+  database = mlAppConfig.contentDatabaseName
+  output_collections = "eBomLink"
+  output_permissions = "rest-reader,read,rest-writer,update"
+  output_uri_replace = ".*data/export/eBomLink,''"
+//  logOutputUri = "mlcp-import-log.txt"
+  /**
+   * The args array can be used for any MLCP parameters that are not supported by the MlcpBean class that MlcpTask
+   * delegates to. input_file_path is supported by MlcpTask; this is just included as an example of using the args
+   * array.
+   */
+  args = ["-input_file_path", "data/export/eBomLink"]
+}
+
+task exportCompressedData(type: com.marklogic.gradle.task.MlcpTask) {
+  description = "Example of using mlcp and MlcpTask to export documents; note the args array is used for any args MlcpTask doesn't yet have as task attributes"
+  classpath = configurations.mlcp
+  command = "EXPORT"
+  host = mlHost
+  port = Integer.parseInt(mlRestPort)
+  username = mlUsername
+  password = mlPassword
+  database = mlAppConfig.contentDatabaseName
+  output_file_path = "data/zips/eBomLink"
+  compress = true
+  collection_filter = "eBomLink"
+//  logOutputUri = "mlcp-export-log.txt"
+}
+
+task exportData(type: com.marklogic.gradle.task.MlcpTask) {
+  description = "Example of using mlcp and MlcpTask to export documents; note the args array is used for any args MlcpTask doesn't yet have as task attributes"
+  classpath = configurations.mlcp
+  command = "EXPORT"
+  host = mlHost
+  port = Integer.parseInt(mlRestPort)
+  username = mlUsername
+  password = mlPassword
+  database = mlAppConfig.contentDatabaseName
+  output_file_path = "data/export/eBomLink"
+  collection_filter = "eBomLink"
+//  logOutputUri = "mlcp-export-log.txt"
+}

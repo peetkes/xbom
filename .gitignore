@@ -1,0 +1,8 @@
+data/backups
+data/export
+data/Prod
+data/Val
+data/zips
+volumes/airbus.local
+data/sample/samples.json
+!data/sample/samples.json.zip
